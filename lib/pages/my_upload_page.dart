@@ -5,7 +5,8 @@ import 'package:image_picker/image_picker.dart';
 class MyUploadPage extends StatefulWidget {
   static final String id = 'my_upload_page';
 
-  const MyUploadPage({Key key}) : super(key: key);
+  PageController pageController;
+  MyUploadPage(this.pageController);
 
   @override
   _MyUploadPageState createState() => _MyUploadPageState();
@@ -74,6 +75,8 @@ class _MyUploadPageState extends State<MyUploadPage> {
     String _caption = _captionController.text.toString();
 
     if (_caption.isEmpty || _image == null) return ;
+
+    widget.pageController.animateToPage(0, duration: Duration(milliseconds: 200), curve: Curves.easeIn);
   }
 
   @override
@@ -86,7 +89,7 @@ class _MyUploadPageState extends State<MyUploadPage> {
         title: Text('Upload', style: TextStyle(color: Colors.black, fontSize: 25, fontFamily: 'Billabong'),),
         centerTitle: true,
         actions: [
-          IconButton(icon: Icon(Icons.post_add, color: Color(0xffFCAF45), size: 25,), onPressed: () {})
+          IconButton(icon: Icon(Icons.post_add, color: Color(0xffFCAF45), size: 25,), onPressed: _uploadNewPost)
         ],
       ),
       body: SafeArea(

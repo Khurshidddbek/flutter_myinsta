@@ -41,9 +41,9 @@ class _HomePageState extends State<HomePage> {
               });
             },
             children: [
-              MyFeedPage(),
+              MyFeedPage(_pageController),
               MySearchPage(),
-              MyUploadPage(),
+              MyUploadPage(_pageController),
               MyLikesPage(),
               MyLikesPage(),
               MyProfilePage(),
