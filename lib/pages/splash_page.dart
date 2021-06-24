@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_myinsta/pages/home_page.dart';
 import 'package:flutter_myinsta/pages/signin_page.dart';
 
 class SplashPage extends StatefulWidget {

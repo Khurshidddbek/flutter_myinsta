@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_myinsta/pages/signup_page.dart';
 
+import 'home_page.dart';
+
 class SignInPage extends StatefulWidget {
   static final String id = 'signin_page';
 
@@ -14,6 +16,10 @@ class _SignInPageState extends State<SignInPage> {
   // values
   var _emailController = TextEditingController();
   var _passwordController = TextEditingController();
+
+  _openHomePage() {
+    Navigator.pushReplacementNamed(context, HomePage.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,15 +93,18 @@ class _SignInPageState extends State<SignInPage> {
                 SizedBox(height: 20,),
 
                 // Button : Sign in
-                Container(
-                  height: 50,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    border: Border.all(color: Colors.white54.withOpacity(0.2), width: 2),
-                  ),
-                  child: Center(
-                    child: Text('Sign in', style: TextStyle(color: Colors.white, fontSize: 16),),
+                GestureDetector(
+                  onTap: _openHomePage,
+                  child: Container(
+                    height: 50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(7),
+                      border: Border.all(color: Colors.white54.withOpacity(0.2), width: 2),
+                    ),
+                    child: Center(
+                      child: Text('Sign in', style: TextStyle(color: Colors.white, fontSize: 16),),
+                    ),
                   ),
                 ),
 
