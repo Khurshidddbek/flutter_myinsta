@@ -2,15 +2,6 @@
 
 Instagram clone application h.
 
-## Getting Started
+### Upload Post -> Page UI
+![Screenshot_2021-06-24-07-09-48-862_com khurshidddbek flutter_myinsta](https://user-images.githubusercontent.com/78873641/123192426-53cfce80-d4bc-11eb-9dca-407b372c1a33.jpg)
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
