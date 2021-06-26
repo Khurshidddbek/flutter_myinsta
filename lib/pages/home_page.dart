@@ -45,7 +45,6 @@ class _HomePageState extends State<HomePage> {
               MySearchPage(),
               MyUploadPage(_pageController),
               MyLikesPage(),
-              MyLikesPage(),
               MyProfilePage(),
             ],
           ),
