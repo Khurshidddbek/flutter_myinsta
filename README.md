@@ -1,22 +1,24 @@
-# flutter_myinsta
+# Instagram clone Application
 
-Instagram clone application h.
+## UI :
 
-### Upload Post -> Page UI
-![Screenshot_2021-06-24-07-09-48-862_com khurshidddbek flutter_myinsta](https://user-images.githubusercontent.com/78873641/123192426-53cfce80-d4bc-11eb-9dca-407b372c1a33.jpg)
+### Step 1 :
+| Spalsh Page UI | Sigin page UI | SignUp page UI |
+|----------------|:---------:|----------------:|
+| ![Splash Page UI](https://user-images.githubusercontent.com/78873641/123501240-e8713280-d65c-11eb-8127-6ff67e678419.jpg) | ![Signin Page UI](https://user-images.githubusercontent.com/78873641/123501243-f030d700-d65c-11eb-8691-28568e48dbef.jpg) | ![SignUp page UI](https://user-images.githubusercontent.com/78873641/123501249-f6bf4e80-d65c-11eb-984f-2934a27920c2.jpg) |
 
-### Feed Page UI
-![Feed Page UI](https://user-images.githubusercontent.com/78873641/123281178-e4d99080-d522-11eb-80fb-3a37c26cb690.jpg)
+### Step 2 :
+| Upload Page UI |
+|----------------|
+| ![Upload Page UI](https://user-images.githubusercontent.com/78873641/123501282-40a83480-d65d-11eb-9807-1ae4d59614c9.jpg) |
 
-### Likes Page UI
-![Like Page UI](https://user-images.githubusercontent.com/78873641/123281242-f458d980-d522-11eb-8d43-d3ff1944b1be.jpg)
+### Step 3 :
+| Feed Page UI | Likes Page UI |
+|----------------|:---------:|
+| ![Feed Page UI](https://user-images.githubusercontent.com/78873641/123501296-6fbea600-d65d-11eb-877a-2d02c6b1053f.jpg) | ![Like Page UI](https://user-images.githubusercontent.com/78873641/123501298-74835a00-d65d-11eb-86fd-ed379571b7d1.jpg) |
 
-## Step 4 :
-### Search Page UI
-![Search Page Ui](https://user-images.githubusercontent.com/78873641/123500536-39caf300-d658-11eb-8b29-949e1d3824b4.jpg)
-
-### Profile Page UI
-![Profile Page Ui](https://user-images.githubusercontent.com/78873641/123500547-4d765980-d658-11eb-92b4-8418e7d21c7f.jpg)
-
-### Edit profile image
-![Edit Profile Picture](https://user-images.githubusercontent.com/78873641/123500559-5e26cf80-d658-11eb-84c0-6919085eb035.jpg)
+### Step 4 :
+| Search Page UI | Profile Page UI | Edit Profile image |
+|----------------|:---------:|----------------:|
+| ![Search Page UI](https://user-images.githubusercontent.com/78873641/123501335-967cdc80-d65d-11eb-994f-94298efbd758.jpg) | ![Profile Page UI](https://user-images.githubusercontent.com/78873641/123501341-9d0b5400-d65d-11eb-9854-57686828c618.jpg) | ![Edit Profile Picture](https://user-images.githubusercontent.com/78873641/123501345-a4326200-d65d-11eb-9aef-527f0d8af3cf.jpg)
+ |
