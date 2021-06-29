@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
+import 'package:flutter_myinsta/services/auth_service.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyProfilePage extends StatefulWidget {
@@ -21,18 +22,24 @@ class _MyProfilePageState extends State<MyProfilePage> {
   File _image;
 
   // demo images
-  String img_1 = 'https://ichef.bbci.co.uk/news/640/cpsprodpb/13B1A/production/_106966608_ferrari_verfremdet.jpg';
-  String img_2 = 'https://www.formacar.com/storage/images/8/26342/020fc1a3af2bd8c6240ff6ff81da86c003.jpg';
+  String img_1 =
+      'https://ichef.bbci.co.uk/news/640/cpsprodpb/13B1A/production/_106966608_ferrari_verfremdet.jpg';
+  String img_2 =
+      'https://www.formacar.com/storage/images/8/26342/020fc1a3af2bd8c6240ff6ff81da86c003.jpg';
 
   @override
   void initState() {
     super.initState();
 
     items.addAll([
-      Post(img_1, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_2, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_1, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_2, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
+      Post(img_1,
+          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
+      Post(img_2,
+          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
+      Post(img_1,
+          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
+      Post(img_2,
+          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
     ]);
   }
 
@@ -40,8 +47,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   // ===========================================================================
   _imgFromCamera() async {
     File image = await ImagePicker.pickImage(
-        source: ImageSource.camera, imageQuality: 50
-    );
+        source: ImageSource.camera, imageQuality: 50);
 
     setState(() {
       _image = image;
@@ -49,9 +55,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   _imgFromGallery() async {
-    File image = await  ImagePicker.pickImage(
-        source: ImageSource.gallery, imageQuality: 50
-    );
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50);
 
     setState(() {
       _image = image;
@@ -85,11 +90,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ),
           );
-        }
-    );
+        });
   }
   // ===========================================================================
-
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +107,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
               color: Colors.black, fontSize: 25, fontFamily: 'Billabong'),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              AuthService.signOutUser(context);
+            },
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
       body: Container(
         width: double.infinity,
@@ -117,21 +131,23 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 Container(
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(70),
-                    border: Border.all(
-                      color: Color(0xffFCAF45),
-                      width: 1.5
-                    )
-                  ),
+                      borderRadius: BorderRadius.circular(70),
+                      border: Border.all(color: Color(0xffFCAF45), width: 1.5)),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(35),
-                    child: _image == null ? Image(
-                      height: 70,
-                      width: 70,
-                      image: AssetImage('assets/images/ic_profile.png'),
-                      fit: BoxFit.cover,
-                    ) : Image.file(_image, height: 70, width: 70, fit: BoxFit.cover,)
-                  ),
+                      borderRadius: BorderRadius.circular(35),
+                      child: _image == null
+                          ? Image(
+                              height: 70,
+                              width: 70,
+                              image: AssetImage('assets/images/ic_profile.png'),
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              _image,
+                              height: 70,
+                              width: 70,
+                              fit: BoxFit.cover,
+                            )),
                 ),
 
                 // Button : Edit Profile image
@@ -142,9 +158,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      IconButton(icon: Icon(Icons.add_circle, color: Color(0xffFCAF45),), onPressed: () {
-                        _showPicker(context);
-                      }),
+                      IconButton(
+                          icon: Icon(
+                            Icons.add_circle,
+                            color: Color(0xffFCAF45),
+                          ),
+                          onPressed: () {
+                            _showPicker(context);
+                          }),
                     ],
                   ),
                 )
@@ -152,12 +173,26 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
 
             // FullName
-            Text('Xurshidbek Sobirov'.toUpperCase(), style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),),
+            Text(
+              'Xurshidbek Sobirov'.toUpperCase(),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
 
-            SizedBox(height: 5,),
+            SizedBox(
+              height: 5,
+            ),
 
             // FullName
-            Text('khurshidddbek@gmail.com', style: TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.normal),),
+            Text(
+              'khurshidddbek@gmail.com',
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal),
+            ),
 
             // POSTS || FOLLOWERS || FOLLOWING
             Container(
@@ -167,20 +202,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 children: [
                   // POSTS
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: [
-                          Text('363', style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),),
-
-                          SizedBox(height: 3,),
-
-                          Text('POSTS', style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.normal),),
-                        ],
-                      ),
-                    )
-                  ),
+                      child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '363',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          'POSTS',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                              fontWeight: FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                  )),
 
                   Container(
                     height: 20,
@@ -190,20 +235,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
                   // FOLLOWERS
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: [
-                          Text('168', style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),),
-
-                          SizedBox(height: 3,),
-
-                          Text('FOLLOWERS', style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.normal),),
-                        ],
-                      ),
-                    )
-                  ),
+                      child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '168',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          'FOLLOWERS',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                              fontWeight: FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                  )),
 
                   Container(
                     height: 20,
@@ -213,20 +268,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
                   // FOLLOWING
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: [
-                          Text('156', style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),),
-
-                          SizedBox(height: 3,),
-
-                          Text('FOLLOWING', style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.normal),),
-                        ],
-                      ),
-                    )
-                  ),
+                      child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '156',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          'FOLLOWING',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                              fontWeight: FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                  )),
                 ],
               ),
             ),
@@ -237,7 +302,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
               children: [
                 // Button : GridView
                 IconButton(
-                  icon: Icon(Icons.grid_view, color: Colors.black,),
+                  icon: Icon(
+                    Icons.grid_view,
+                    color: Colors.black,
+                  ),
                   onPressed: () {
                     setState(() {
                       _listView = false;
@@ -247,7 +315,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
                 // Button : ListView
                 IconButton(
-                  icon: Icon(Icons.list_alt, color: Colors.black,),
+                  icon: Icon(
+                    Icons.list_alt,
+                    color: Colors.black,
+                  ),
                   onPressed: () {
                     setState(() {
                       _listView = true;
@@ -260,7 +331,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
             // Posts
             Expanded(
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: _listView ? 1 : 2),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: _listView ? 1 : 2),
                 itemCount: items.length,
                 itemBuilder: (ctx, i) {
                   return _itemOfPost(items[i]);
@@ -289,10 +361,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
           ),
 
-          SizedBox(height: 3,),
+          SizedBox(
+            height: 3,
+          ),
 
           // Caption
-          Text(post.caption, maxLines: 2, style: TextStyle(color: Colors.black45, fontSize: 16),)
+          Text(
+            post.caption,
+            maxLines: 2,
+            style: TextStyle(color: Colors.black45, fontSize: 16),
+          )
         ],
       ),
     );

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_myinsta/pages/home_page.dart';
 import 'package:flutter_myinsta/pages/signin_page.dart';
@@ -15,8 +14,8 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   _initTimer() {
-    Timer(Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, SignInPage.id);
+    Timer(Duration(seconds: 1), () {
+      Navigator.pushReplacementNamed(context, HomePage.id);
     });
   }
 
@@ -36,22 +35,29 @@ class _SplashPageState extends State<SplashPage> {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xffFCAF45),
-              Color(0xffF56040),
-            ]
-          ),
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xffFCAF45),
+                Color(0xffF56040),
+              ]),
         ),
         child: Column(
           children: [
-            Expanded(child: Center(
-              child: Text('Instagram', style: TextStyle(color: Colors.white, fontSize: 45, fontFamily: 'Billabong'),),
+            Expanded(
+                child: Center(
+              child: Text(
+                'Instagram',
+                style: TextStyle(
+                    color: Colors.white, fontSize: 45, fontFamily: 'Billabong'),
+              ),
             )),
 
             // Text : All rights reserved
-            Text('All rights reserved', style: TextStyle(fontSize: 16, color: Colors.white),),
+            Text(
+              'All rights reserved',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
           ],
         ),
       ),
