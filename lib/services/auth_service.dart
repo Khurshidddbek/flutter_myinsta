@@ -7,29 +7,30 @@ import 'package:flutter_myinsta/services/utils_service.dart';
 class AuthService {
   static final _auth = FirebaseAuth.instance;
 
-  static Future<FirebaseUser> signInUser(
+  static Future<Map<String, FirebaseUser>> signInUser(
       BuildContext context, String email, String password) async {
     try {
       _auth.signInWithEmailAndPassword(email: email, password: password);
-      final FirebaseUser user = await _auth.currentUser();
-      return user;
+      final FirebaseUser firebaseUser = await _auth.currentUser();
+      return ({'SUCCESS': firebaseUser});
     } catch (e) {
       Utils.fireToast('SignInWithEmailAndPassword Error : $e');
     }
-    return null;
+    return ({'ERROR': null});
   }
 
-  static Future<FirebaseUser> signUpUser(
+  static Future<Map<String, FirebaseUser>> signUpUser(
       BuildContext context, String email, String password) async {
     try {
       var authResult = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      FirebaseUser user = authResult.user;
-      return user;
+      FirebaseUser firebaseUser = authResult.user;
+      return ({'SUCCESS': firebaseUser});
     } catch (e) {
-      Utils.fireToast('createUserWithEmailAndPassword Error : $e');
+      if (e.errorCode == 'ERROR_EMAIL_ALREADY_IN_USE')
+        return ({'ERROR_EMAIL_ALREADY_IN_USE': null});
     }
-    return null;
+    return ({'ERROR': null});
   }
 
   static void signOutUser(BuildContext context) {

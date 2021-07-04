@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_myinsta/model/user_model.dart';
+import 'package:flutter_myinsta/services/data_service.dart';
 
 class MySearchPage extends StatefulWidget {
   static final String id = 'my_search_page';
@@ -13,23 +14,31 @@ class MySearchPage extends StatefulWidget {
 class _MySearchPageState extends State<MySearchPage> {
   // values
   var _searchController = TextEditingController();
-  List<User> users = [];
+  List<User> users = List();
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
-    users.addAll([
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-      User('Xurshidbek Sobirov', 'khurshidddbek@gmail.com'),
-    ]);
+    _apiSearchUsers("");
+  }
+
+  _apiSearchUsers(String keyword) {
+    setState(() {
+      isLoading = true;
+    });
+
+    DataService.searchUsers(keyword).then((respUsers) => {
+          _respSearchUsers(respUsers),
+        });
+  }
+
+  _respSearchUsers(List<User> respUsers) {
+    setState(() {
+      users = respUsers;
+      isLoading = false;
+    });
   }
 
   @override
@@ -39,47 +48,70 @@ class _MySearchPageState extends State<MySearchPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Search', style: TextStyle(color: Colors.black,fontSize: 25, fontFamily: 'Billabong'),),
+        title: Text(
+          'Search',
+          style: TextStyle(
+              color: Colors.black, fontSize: 25, fontFamily: 'Billabong'),
+        ),
         centerTitle: true,
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: [
-            // TextField : Search
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(7),
-                color: Colors.grey.withOpacity(0.4),
-              ),
-              child: TextField(
-                controller: _searchController,
-                style: TextStyle(color: Colors.black87),
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 15,),
-                  icon: Icon(Icons.search, color: Colors.grey,),
-                  border: InputBorder.none
+      body: Stack(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [
+                // TextField : Search
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(7),
+                    color: Colors.grey.withOpacity(0.4),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    style: TextStyle(color: Colors.black87),
+                    onChanged: (input) {
+                      _apiSearchUsers(input);
+                    },
+                    decoration: InputDecoration(
+                        hintText: 'Search',
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15,
+                        ),
+                        icon: Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                        ),
+                        border: InputBorder.none),
+                  ),
                 ),
-              ),
-            ),
 
-            SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
 
-            // Users
-            Expanded(
-              child: ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (ctx, i) {
-                  return _itemsOfList(users[i]);
-                },
-              ),
+                // Users
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (ctx, i) {
+                      return _itemsOfList(users[i]);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox.shrink()
+        ],
       ),
     );
   }
@@ -101,16 +133,25 @@ class _MySearchPageState extends State<MySearchPage> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(22.5),
-              child: Image(
-                height: 45,
-                width: 45,
-                image: AssetImage('assets/images/ic_profile.png'),
-                fit: BoxFit.cover,
-              ),
+              child: user.imgUrl == null || user.imgUrl.isEmpty
+                  ? Image(
+                      image: AssetImage("assets/images/ic_profile.png"),
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(
+                      user.imgUrl,
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
 
-          SizedBox(width: 5,),
+          SizedBox(
+            width: 5,
+          ),
 
           // FullName || Email
           Column(
@@ -118,12 +159,26 @@ class _MySearchPageState extends State<MySearchPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // FullName
-              Text(user.fullName, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),),
+              Text(
+                user.fullName,
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
 
-              SizedBox(height: 5,),
+              SizedBox(
+                height: 5,
+              ),
 
-              // FullName
-              Text(user.email, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal, fontSize: 14),),
+              // Email
+              Text(
+                user.email,
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14),
+              ),
             ],
           ),
 
@@ -142,7 +197,13 @@ class _MySearchPageState extends State<MySearchPage> {
                     ),
                   ),
                   child: Center(
-                    child: Text('Follow', style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.bold),),
+                    child: Text(
+                      'Follow',
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],

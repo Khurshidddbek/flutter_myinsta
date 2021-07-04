@@ -32,25 +32,30 @@ class _SignInPageState extends State<SignInPage> {
     setState(() {
       isLoading = true;
     });
-    AuthService.signInUser(context, email, password).then((firebaseUser) => {
-          _getFirebaseUser(firebaseUser),
+    AuthService.signInUser(context, email, password).then((map) => {
+          _getFirebaseUser(map),
         });
   }
 
-  _getFirebaseUser(FirebaseUser firebaseUser) async {
+  _getFirebaseUser(map) async {
     setState(() {
       isLoading = false;
     });
-    if (firebaseUser != null) {
-      await Prefs.saveUserId(firebaseUser.uid);
-      Navigator.pushReplacementNamed(context, HomePage.id);
-    } else {
-      Utils.fireToast("Check your email or password");
-    }
-  }
 
-  _openHomePage() {
-    Navigator.pushReplacementNamed(context, HomePage.id);
+    FirebaseUser firebaseUser;
+
+    if (!map.containsKey('SUCCESS')) {
+      Utils.fireToast('Check email or password');
+      return;
+    }
+
+    firebaseUser = map['SUCCESS'];
+
+    if (firebaseUser == null) return;
+
+    await Prefs.saveUserId(firebaseUser.uid).then((value) => {
+          Navigator.pushReplacementNamed(context, HomePage.id),
+        });
   }
 
   @override

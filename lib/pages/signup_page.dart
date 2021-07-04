@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_myinsta/model/user_model.dart';
 import 'package:flutter_myinsta/pages/signin_page.dart';
 import 'package:flutter_myinsta/services/auth_service.dart';
+import 'package:flutter_myinsta/services/data_service.dart';
 import 'package:flutter_myinsta/services/prefs_service.dart';
 import 'package:flutter_myinsta/services/utils_service.dart';
 
@@ -25,37 +27,55 @@ class _SignUpPageState extends State<SignUpPage> {
   var isLoading = false;
 
   _doSignUp() {
+    // values
     String name = _fullNameController.text.toString().trim();
     String email = _emailController.text.toString().trim();
     String password = _passwordController.text.toString().trim();
     String cPassword = _cPasswordController.text.toString().trim();
 
+    // validation
     if (name.isEmpty || email.isEmpty || password.isEmpty) return;
     if (password != cPassword) {
       Utils.fireToast('Password and confirm password does not match!');
       return;
     }
-
     if (!(Utils.emailAndPasswordValidation(email, password))) return;
 
     setState(() {
       isLoading = true;
     });
-    AuthService.signUpUser(context, email, password).then((firebaseUser) => {
-          _getFirebaseUser(firebaseUser),
+
+    AuthService.signUpUser(context, email, password).then((map) => {
+          _getFirebaseUser(
+              User(fullName: name, email: email, password: password), map),
         });
   }
 
-  _getFirebaseUser(FirebaseUser firebaseUser) async {
+  _getFirebaseUser(User user, Map<String, FirebaseUser> map) async {
     setState(() {
       isLoading = false;
     });
-    if (firebaseUser != null) {
-      await Prefs.saveUserId(firebaseUser.uid);
-      Navigator.pushReplacementNamed(context, HomePage.id);
-    } else {
-      Utils.fireToast("Check your informations");
+
+    // validation
+    if (!map.containsKey('SUCCESS')) {
+      if (map.containsKey('ERROR_EMAIL_ALREADY_IN_USE'))
+        Utils.fireToast('Email already in use');
+      else
+        Utils.fireToast('Try again later');
+      return;
     }
+
+    FirebaseUser firebaseUser = map['SUCCESS'];
+    if (firebaseUser == null) return;
+
+    await Prefs.saveUserId(firebaseUser.uid);
+
+    user.uid = firebaseUser.uid;
+
+    DataService.storeUser(user).then((value) => {
+          Navigator.pushNamedAndRemoveUntil(
+              context, HomePage.id, (route) => false),
+        });
   }
 
   @override
@@ -250,8 +270,12 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             isLoading
-                ? Center(
-                    child: CircularProgressIndicator(),
+                ? Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: double.infinity,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   )
                 : SizedBox.shrink(),
           ],
