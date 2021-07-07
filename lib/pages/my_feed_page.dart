@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
+import 'package:flutter_myinsta/services/data_service.dart';
 
 class MyFeedPage extends StatefulWidget {
   static final String id = 'my_feed_page';
@@ -16,21 +17,29 @@ class MyFeedPage extends StatefulWidget {
 class _MyFeedPageState extends State<MyFeedPage> {
   // values
   List<Post> items = [];
-
-  // demo images
-  String img_1 = 'https://ichef.bbci.co.uk/news/640/cpsprodpb/13B1A/production/_106966608_ferrari_verfremdet.jpg';
-  String img_2 = 'https://www.formacar.com/storage/images/8/26342/020fc1a3af2bd8c6240ff6ff81da86c003.jpg';
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
 
-    items.addAll([
-      Post(img_1, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_2, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-    ]);
+    _apiLoadFeeds();
   }
 
+  _apiLoadFeeds() {
+    setState(() {
+      isLoading = true;
+    });
+
+    DataService.loadFeeds().then((posts) => {_resLoadFeeds(posts)});
+  }
+
+  _resLoadFeeds(List<Post> posts) {
+    setState(() {
+      items = posts;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +48,22 @@ class _MyFeedPageState extends State<MyFeedPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Instagram', style: TextStyle(color: Colors.black,fontSize: 25, fontFamily: 'Billabong'),),
+        title: Text(
+          'Instagram',
+          style: TextStyle(
+              color: Colors.black, fontSize: 25, fontFamily: 'Billabong'),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
-              widget.pageController.animateToPage(2, duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+              widget.pageController.animateToPage(2,
+                  duration: Duration(milliseconds: 200), curve: Curves.easeIn);
             },
-            icon: Icon(Icons.camera_alt, color: Colors.black,),
+            icon: Icon(
+              Icons.camera_alt,
+              color: Color(0xffFCAF45),
+            ),
           ),
         ],
       ),
@@ -77,24 +94,38 @@ class _MyFeedPageState extends State<MyFeedPage> {
                   children: [
                     // Profile image
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(40),
-                      child: Image(
-                        height: 40,
-                        width: 40,
-                        image: AssetImage('assets/images/ic_profile.png'),
-                        fit: BoxFit.cover,
-                      ),
+                      borderRadius: BorderRadius.circular(22.5),
+                      child: post.imgUser == null || post.imgUser.isEmpty
+                          ? Image(
+                              image: AssetImage("assets/images/ic_profile.png"),
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              post.imgUser,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                     ),
 
-                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: 10,
+                    ),
 
                     // Username || Data
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Username', style: TextStyle(color: Colors.black),),
-
-                        Text('February 2, 2021', style: TextStyle(color: Colors.grey),),
+                        Text(
+                          post.fullName,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        Text(
+                          post.date,
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ],
                     ),
                   ],
@@ -111,8 +142,12 @@ class _MyFeedPageState extends State<MyFeedPage> {
 
           // Post image
           CachedNetworkImage(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
             imageUrl: post.postImage,
-            placeholder: (context, url) => CircularProgressIndicator(),
+            placeholder: (context, url) =>
+                Center(child: CircularProgressIndicator()),
             errorWidget: (context, url, error) => Icon(Icons.error),
           ),
 
@@ -125,25 +160,24 @@ class _MyFeedPageState extends State<MyFeedPage> {
               ),
               IconButton(
                 onPressed: () {},
-                icon: Icon(FontAwesome.send),
+                icon: Icon(Icons.share_outlined),
               ),
             ],
           ),
 
           // Caption
           Container(
+            width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
             child: RichText(
               softWrap: true,
               overflow: TextOverflow.visible,
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: " " + post.caption,
-                    style: TextStyle(color: Colors.black),
-                  )
-                ]
-              ),
+              text: TextSpan(children: [
+                TextSpan(
+                  text: " " + post.caption,
+                  style: TextStyle(color: Colors.black),
+                )
+              ]),
             ),
           ),
         ],

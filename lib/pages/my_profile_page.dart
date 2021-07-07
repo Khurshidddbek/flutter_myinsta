@@ -24,31 +24,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
   bool _listView = true;
   File _image;
   bool isLoading = false;
+  int count_posts = 0;
 
   String fullName = '', email = '', imgUrl = '';
-
-  // demo images
-  String img_1 =
-      'https://ichef.bbci.co.uk/news/640/cpsprodpb/13B1A/production/_106966608_ferrari_verfremdet.jpg';
-  String img_2 =
-      'https://www.formacar.com/storage/images/8/26342/020fc1a3af2bd8c6240ff6ff81da86c003.jpg';
 
   @override
   void initState() {
     super.initState();
 
     _apiLoadUser();
-
-    items.addAll([
-      Post(img_1,
-          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_2,
-          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_1,
-          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_2,
-          'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-    ]);
+    _apiLoadPosts();
   }
 
   // Image Picker
@@ -150,6 +135,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
     _apiLoadUser();
   }
 
+  _apiLoadPosts() {
+    DataService.loadPosts().then((value) => {_resLoadPosts(value)});
+  }
+
+  _resLoadPosts(List<Post> posts) {
+    setState(() {
+      items = posts;
+      count_posts = items.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,7 +166,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             },
             icon: Icon(
               Icons.exit_to_app,
-              color: Colors.black,
+              color: Color(0xffFCAF45),
             ),
           ),
         ],
@@ -268,7 +264,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '363',
+                              count_posts.toString(),
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,
@@ -424,7 +420,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
               width: double.infinity,
               imageUrl: post.postImage,
               fit: BoxFit.cover,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) =>
+                  Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),
@@ -434,10 +431,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
           ),
 
           // Caption
-          Text(
-            post.caption,
-            maxLines: 2,
-            style: TextStyle(color: Colors.black45, fontSize: 16),
+          Container(
+            width: double.infinity,
+            child: Text(
+              post.caption,
+              maxLines: 2,
+              style: TextStyle(color: Colors.black45, fontSize: 16),
+            ),
           )
         ],
       ),

@@ -16,20 +16,10 @@ class _MyLikesPageState extends State<MyLikesPage> {
   // values
   List<Post> items = [];
 
-  // demo images
-  String img_1 = 'https://ichef.bbci.co.uk/news/640/cpsprodpb/13B1A/production/_106966608_ferrari_verfremdet.jpg';
-  String img_2 = 'https://www.formacar.com/storage/images/8/26342/020fc1a3af2bd8c6240ff6ff81da86c003.jpg';
-
   @override
   void initState() {
     super.initState();
-
-    items.addAll([
-      Post(img_1, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-      Post(img_2, 'This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption, This is demo caption, this first demo caption'),
-    ]);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +28,11 @@ class _MyLikesPageState extends State<MyLikesPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Likes', style: TextStyle(color: Colors.black,fontSize: 25, fontFamily: 'Billabong'),),
+        title: Text(
+          'Likes',
+          style: TextStyle(
+              color: Colors.black, fontSize: 25, fontFamily: 'Billabong'),
+        ),
         centerTitle: true,
       ),
       body: ListView.builder(
@@ -77,15 +71,22 @@ class _MyLikesPageState extends State<MyLikesPage> {
                       ),
                     ),
 
-                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: 10,
+                    ),
 
                     // Username || Data
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Username', style: TextStyle(color: Colors.black),),
-
-                        Text('February 2, 2021', style: TextStyle(color: Colors.grey),),
+                        Text(
+                          'Username',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        Text(
+                          'February 2, 2021',
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ],
                     ),
                   ],
@@ -112,7 +113,10 @@ class _MyLikesPageState extends State<MyLikesPage> {
             children: [
               IconButton(
                 onPressed: () {},
-                icon: Icon(FontAwesome.heart, color: Colors.red,),
+                icon: Icon(
+                  FontAwesome.heart,
+                  color: Colors.red,
+                ),
               ),
               IconButton(
                 onPressed: () {},
@@ -127,14 +131,12 @@ class _MyLikesPageState extends State<MyLikesPage> {
             child: RichText(
               softWrap: true,
               overflow: TextOverflow.visible,
-              text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: " " + post.caption,
-                      style: TextStyle(color: Colors.black),
-                    )
-                  ]
-              ),
+              text: TextSpan(children: [
+                TextSpan(
+                  text: " " + post.caption,
+                  style: TextStyle(color: Colors.black),
+                )
+              ]),
             ),
           ),
         ],
