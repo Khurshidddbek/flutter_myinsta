@@ -106,7 +106,7 @@ class _MyUploadPageState extends State<MyUploadPage> {
 
   _moveToFeed() {
     _image = null;
-    _captionController.text = null;
+    _captionController.text = '';
 
     setState(() {
       isLoading = false;

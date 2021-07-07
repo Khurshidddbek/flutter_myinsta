@@ -41,6 +41,32 @@ class _MyFeedPageState extends State<MyFeedPage> {
     });
   }
 
+  _apiPostLike(Post post) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await DataService.likePost(post, true);
+
+    setState(() {
+      isLoading = false;
+      post.liked = true;
+    });
+  }
+
+  _apiPostUnlike(Post post) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await DataService.likePost(post, false);
+
+    setState(() {
+      isLoading = false;
+      post.liked = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,11 +93,20 @@ class _MyFeedPageState extends State<MyFeedPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (ctx, index) {
-          return _postOfItems(items[index]);
-        },
+      body: Stack(
+        children: [
+          ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (ctx, index) {
+              return _postOfItems(items[index]);
+            },
+          ),
+          isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox.shrink()
+        ],
       ),
     );
   }
@@ -155,8 +190,19 @@ class _MyFeedPageState extends State<MyFeedPage> {
           Row(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: Icon(FontAwesome.heart_o),
+                onPressed: () {
+                  if (post.liked) {
+                    _apiPostUnlike(post);
+                  } else {
+                    _apiPostLike(post);
+                  }
+                },
+                icon: !post.liked
+                    ? Icon(FontAwesome.heart_o)
+                    : Icon(
+                        FontAwesome.heart,
+                        color: Colors.red,
+                      ),
               ),
               IconButton(
                 onPressed: () {},

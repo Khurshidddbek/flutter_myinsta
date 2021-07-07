@@ -12,6 +12,9 @@ class DataService {
   static String folder_posts = "posts";
   static String folder_feeds = "feeds";
 
+  static String folder_following = "following";
+  static String folder_followers = "followers";
+
   // User Related
   static Future storeUser(User user) async {
     user.uid = await Prefs.loadUserId();
@@ -24,25 +27,43 @@ class DataService {
 
   static Future<User> loadUser() async {
     String uid = await Prefs.loadUserId();
-    final instance = Firestore.instance;
-    var value = await instance.collection('users').document(uid).get();
-    return User.fromJson(value.data);
+    var value = await _firestore.collection(folder_users).document(uid).get();
+    User user = User.fromJson(value.data);
+
+    var querySnapshot1 = await _firestore
+        .collection(folder_users)
+        .document(uid)
+        .collection(folder_followers)
+        .getDocuments();
+
+    user.followersCount = querySnapshot1.documents.length;
+
+    var querySnapshot2 = await _firestore
+        .collection(folder_users)
+        .document(uid)
+        .collection(folder_following)
+        .getDocuments();
+
+    user.followingCount = querySnapshot2.documents.length;
+
+    return user;
   }
 
   static Future updateUser(User user) async {
     String uid = await Prefs.loadUserId();
     final instance = Firestore.instance;
-    return instance.collection('users').document(uid).updateData(user.toJson());
+    return instance
+        .collection(folder_users)
+        .document(uid)
+        .updateData(user.toJson());
   }
 
   static Future<List<User>> searchUsers(String keyword) async {
     List<User> users = List();
     String uid = await Prefs.loadUserId();
 
-    final instance = Firestore.instance;
-
-    var querySnapshot = await instance
-        .collection('users')
+    var querySnapshot = await _firestore
+        .collection(folder_users)
         .orderBy('email')
         .startAt([keyword]).getDocuments();
 
@@ -51,6 +72,26 @@ class DataService {
 
       if (respUser.uid != uid) users.add(respUser);
     });
+
+    List<User> following = List();
+
+    var querySnapshot2 = await _firestore
+        .collection(folder_users)
+        .document(uid)
+        .collection(folder_following)
+        .getDocuments();
+
+    querySnapshot2.documents.forEach((element) {
+      following.add(User.fromJson(element.data));
+    });
+
+    for (User user in users) {
+      if (following.contains(user)) {
+        user.followed = true;
+      } else
+        user.followed = false;
+    }
+
     return users;
   }
 
@@ -126,5 +167,142 @@ class DataService {
       posts.add(post);
     });
     return posts;
+  }
+
+  static Future<Post> likePost(Post post, bool liked) async {
+    String uid = await Prefs.loadUserId();
+    post.liked = liked;
+
+    await _firestore
+        .collection(folder_users)
+        .document(uid)
+        .collection(folder_feeds)
+        .document(post.id)
+        .setData(post.toJson());
+
+    if (uid == post.uid) {
+      await _firestore
+          .collection(folder_users)
+          .document(uid)
+          .collection(folder_posts)
+          .document(post.id)
+          .setData(post.toJson());
+    }
+  }
+
+  static Future<List<Post>> loadLikes() async {
+    String uid = await Prefs.loadUserId();
+    List<Post> posts = List();
+
+    var querySnapshot = await _firestore
+        .collection(folder_users)
+        .document(uid)
+        .collection(folder_feeds)
+        .where('liked', isEqualTo: true)
+        .getDocuments();
+
+    querySnapshot.documents.forEach((element) {
+      Post post = Post.fromJson(element.data);
+      // if (uid == post.uid) post.mine = true;
+      posts.add(post);
+    });
+    return posts;
+  }
+
+  // Follow and Following Related
+
+  static Future<User> followUser(User someone) async {
+    User me = await loadUser();
+
+    // I followed to someone
+    await _firestore
+        .collection(folder_users)
+        .document(me.uid)
+        .collection(folder_following)
+        .document(someone.uid)
+        .setData(someone.toJson());
+
+    // I am in someone's followers
+    await _firestore
+        .collection(folder_users)
+        .document(someone.uid)
+        .collection(folder_followers)
+        .document(me.uid)
+        .setData(me.toJson());
+
+    return someone;
+  }
+
+  static Future<User> unfollowUser(User someone) async {
+    User me = await loadUser();
+
+    // I un followed to someone
+    await _firestore
+        .collection(folder_users)
+        .document(me.uid)
+        .collection(folder_following)
+        .document(someone.uid)
+        .delete();
+
+    // I am not in someone's followers
+    await _firestore
+        .collection(folder_users)
+        .document(someone.uid)
+        .collection(folder_followers)
+        .document(me.uid)
+        .delete();
+
+    return someone;
+  }
+
+  static Future storePostToMyFeed(User someone) async {
+    // Store someone's posts to my feed
+
+    List<Post> posts = List();
+
+    var querySnapshot = await _firestore
+        .collection(folder_users)
+        .document(someone.uid)
+        .collection(folder_posts)
+        .getDocuments();
+
+    querySnapshot.documents.forEach((element) {
+      var post = Post.fromJson(element.data);
+      post.liked = false;
+      posts.add(post);
+    });
+
+    for (Post post in posts) {
+      storeFeed(post);
+    }
+  }
+
+  static Future removePostsFromMyFeed(User someone) async {
+    List<Post> posts = List();
+
+    var querySnapshot = await _firestore
+        .collection(folder_users)
+        .document(someone.uid)
+        .collection(folder_posts)
+        .getDocuments();
+
+    querySnapshot.documents.forEach((element) {
+      posts.add(Post.fromJson(element.data));
+    });
+
+    for (Post post in posts) {
+      removeFeed(post);
+    }
+  }
+
+  static Future removeFeed(Post post) async {
+    String uid = await Prefs.loadUserId();
+
+    return await _firestore
+        .collection(folder_users)
+        .document(uid)
+        .collection(folder_feeds)
+        .document(post.id)
+        .delete();
   }
 }

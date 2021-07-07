@@ -24,7 +24,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   bool _listView = true;
   File _image;
   bool isLoading = false;
-  int count_posts = 0;
+  int count_posts = 0, count_followers = 0, count_following = 0;
 
   String fullName = '', email = '', imgUrl = '';
 
@@ -106,7 +106,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
       this.fullName = user.fullName;
       this.email = user.email;
       this.imgUrl = user.imgUrl;
-      isLoading = false;
+      this.count_followers = user.followersCount;
+      this.count_following = user.followingCount;
+
+      this.isLoading = false;
     });
   }
 
@@ -297,7 +300,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '168',
+                              count_followers.toString(),
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,
@@ -330,7 +333,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '156',
+                              count_following.toString(),
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,

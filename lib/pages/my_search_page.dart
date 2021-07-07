@@ -41,6 +41,32 @@ class _MySearchPageState extends State<MySearchPage> {
     });
   }
 
+  _apiFollowUser(User someone) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await DataService.followUser(someone);
+    setState(() {
+      someone.followed = true;
+      isLoading = false;
+    });
+    DataService.storePostToMyFeed(someone);
+  }
+
+  _apiUnfollowUser(User someone) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await DataService.unfollowUser(someone);
+    setState(() {
+      someone.followed = false;
+      isLoading = false;
+    });
+    DataService.removePostsFromMyFeed(someone);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,22 +213,31 @@ class _MySearchPageState extends State<MySearchPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  height: 30,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
-                    border: Border.all(
-                      color: Colors.grey.withOpacity(0.4),
+                GestureDetector(
+                  onTap: () {
+                    if (user.followed) {
+                      _apiUnfollowUser(user);
+                    } else {
+                      _apiFollowUser(user);
+                    }
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.4),
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Follow',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
+                    child: Center(
+                      child: Text(
+                        user.followed ? 'Followed' : 'Follow',
+                        style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ),
