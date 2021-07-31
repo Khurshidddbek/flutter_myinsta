@@ -4,6 +4,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
 import 'package:flutter_myinsta/services/data_service.dart';
 
+import '../model/post_model.dart';
+
 class MyFeedPage extends StatefulWidget {
   static final String id = 'my_feed_page';
 
@@ -41,6 +43,35 @@ class _MyFeedPageState extends State<MyFeedPage> {
     });
   }
 
+  // Like || Unlike actions
+  // ===========================================================================
+  _apiPostLike(Post post) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await DataService.likePost(post, true);
+
+    setState(() {
+      isLoading = false;
+      post.liked = true;
+    });
+  }
+
+  _apiPostUnlike(Post post) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await DataService.likePost(post, false);
+
+    setState(() {
+      isLoading = false;
+      post.liked = true;
+    });
+  }
+  // ===========================================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,11 +98,18 @@ class _MyFeedPageState extends State<MyFeedPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (ctx, index) {
-          return _postOfItems(items[index]);
-        },
+      body: Stack(
+        children: [
+          items.length != 0 ?
+          ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (ctx, index) {
+              return _postOfItems(items[index]);
+            },
+          ) : Center(child: Text('No posts'),),
+
+          isLoading ? Center(child: CircularProgressIndicator(),) : SizedBox.shrink(),
+        ],
       ),
     );
   }
@@ -155,8 +193,14 @@ class _MyFeedPageState extends State<MyFeedPage> {
           Row(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: Icon(FontAwesome.heart_o),
+                onPressed: () {
+                  if (!post.liked) {
+                    _apiPostLike(post);
+                  } else {
+                    _apiPostUnlike(post);
+                  }
+                },
+                icon: !post.liked ? Icon(FontAwesome.heart_o) : Icon(FontAwesome.heart, color: Colors.red,),
               ),
               IconButton(
                 onPressed: () {},

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
+import 'package:flutter_myinsta/services/data_service.dart';
 
 class MyLikesPage extends StatefulWidget {
   static final String id = 'my_likes_page';
@@ -15,10 +17,41 @@ class MyLikesPage extends StatefulWidget {
 class _MyLikesPageState extends State<MyLikesPage> {
   // values
   List<Post> items = [];
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
+
+    _apiLoadLikes();
+  }
+
+  _apiLoadLikes() {
+    setState(() {
+      isLoading = true;
+    });
+
+    DataService.loadLikes().then((value) => {
+      _resLoadLikes(value),
+    });
+  }
+
+  _resLoadLikes(List<Post> posts) {
+    setState(() {
+      items = posts;
+      isLoading = false;
+    });
+  }
+
+  _apiPostUnlike(Post post) {
+    setState(() {
+      isLoading = true;
+      post.liked = false;
+    });
+    
+    DataService.likePost(post, false).then((value) => {
+      _apiLoadLikes(),
+    });
   }
 
   @override
@@ -35,11 +68,18 @@ class _MyLikesPageState extends State<MyLikesPage> {
         ),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (ctx, index) {
-          return _postOfItems(items[index]);
-        },
+      body: Stack(
+        children: [
+          items.length > 0 ?
+          ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (ctx, index) {
+              return _postOfItems(items[index]);
+            },
+          ) : Center(child: Text('No liked posts'),),
+
+          isLoading ? Center(child: CircularProgressIndicator(),) : SizedBox.shrink(),
+        ],
       ),
     );
   }
@@ -103,16 +143,22 @@ class _MyLikesPageState extends State<MyLikesPage> {
 
           // Post image
           CachedNetworkImage(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
             imageUrl: post.postImage,
-            placeholder: (context, url) => CircularProgressIndicator(),
+            placeholder: (context, url) =>
+                Center(child: CircularProgressIndicator()),
             errorWidget: (context, url, error) => Icon(Icons.error),
           ),
 
-          // Buttons : Like || Share
+          // Buttons : Unlike || Share
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  _apiPostUnlike(post);
+                },
                 icon: Icon(
                   FontAwesome.heart,
                   color: Colors.red,
@@ -127,6 +173,7 @@ class _MyLikesPageState extends State<MyLikesPage> {
 
           // Caption
           Container(
+            width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
             child: RichText(
               softWrap: true,

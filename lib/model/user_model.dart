@@ -25,4 +25,9 @@ class User {
         'password': password,
         'imgUrl': imgUrl,
       };
-}
+
+  @override
+  bool operator ==(Object other) {
+    return (other is User) && other.uid == uid;
+  }
+  }

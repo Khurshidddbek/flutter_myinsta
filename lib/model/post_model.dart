@@ -1,3 +1,5 @@
+import 'package:flutter_myinsta/model/user_model.dart';
+
 class Post {
   String uid;
   String fullName;
@@ -32,4 +34,9 @@ class Post {
         'date': date,
         'liked': liked,
       };
+
+  @override
+  bool operator ==(Object other) {
+    return (other is Post) && other.uid == uid;
+  }
 }
