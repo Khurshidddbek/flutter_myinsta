@@ -27,14 +27,15 @@ class DataService {
   static Future<User> loadUser() async {
     String uid = await Prefs.loadUserId();
     final instance = Firestore.instance;
-    var value = await instance.collection('users').document(uid).get();
+
+    var value = await _firestore.collection(folder_users).document(uid).get();
 
     User user = User.fromJson(value.data);
 
-    var querySnapshot1 = await instance.collection(folder_users).document(uid).collection(folder_followers).getDocuments();
+    var querySnapshot1 = await _firestore.collection(folder_users).document(uid).collection(folder_followers).getDocuments();
     user.followersCount = querySnapshot1.documents.length;
 
-    var querySnapshot2 = await instance.collection(folder_users).document(uid).collection(folder_following).getDocuments();
+    var querySnapshot2 = await _firestore.collection(folder_users).document(uid).collection(folder_following).getDocuments();
     user.followingCount = querySnapshot2.documents.length;
 
     return user;
@@ -43,7 +44,7 @@ class DataService {
   static Future updateUser(User user) async {
     String uid = await Prefs.loadUserId();
     final instance = Firestore.instance;
-    return instance.collection('users').document(uid).updateData(user.toJson());
+    return instance.collection(folder_users).document(uid).updateData(user.toJson());
   }
 
   static Future<List<User>> searchUsers(String keyword) async {
@@ -52,8 +53,8 @@ class DataService {
 
     final instance = Firestore.instance;
 
-    var querySnapshot = await instance
-        .collection('users')
+    var querySnapshot = await _firestore
+        .collection(folder_users)
         .orderBy('email')
         .startAt([keyword]).getDocuments();
 
@@ -62,6 +63,23 @@ class DataService {
 
       if (respUser.uid != uid) users.add(respUser);
     });
+
+    List<User> following = List();
+
+    var querySnapshot2 = await _firestore.collection(folder_users).document(uid).collection(folder_following).getDocuments();
+
+    querySnapshot2.documents.forEach((element) {
+      following.add(User.fromJson(element.data));
+    });
+
+    for (User user in users) {
+      if (following.contains(user)) {
+        user.followed = true;
+      } else {
+        user.followed = false;
+      }
+    }
+
     return users;
   }
 
@@ -112,7 +130,7 @@ class DataService {
     var querySnapshot = await _firestore
         .collection(folder_users)
         .document(uid)
-        .collection(folder_posts)
+        .collection(folder_feeds)
         .getDocuments();
 
     querySnapshot.documents.forEach((element) {

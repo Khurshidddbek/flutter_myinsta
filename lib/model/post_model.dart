@@ -37,6 +37,6 @@ class Post {
 
   @override
   bool operator ==(Object other) {
-    return (other is Post) && other.uid == uid;
+    return (other is User) && other.uid == uid;
   }
 }
