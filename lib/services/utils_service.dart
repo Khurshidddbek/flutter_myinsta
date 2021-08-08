@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_myinsta/services/prefs_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Utils {
@@ -39,5 +43,58 @@ class Utils {
     String convertedDateTime =
         "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}:${now.minute.toString()}";
     return convertedDateTime;
+  }
+
+  static Future<bool> commonDialog(BuildContext context, String title, String content, bool isSingle) async {
+    return await showDialog(context: context, builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          // Button : Cancel
+          !isSingle ?
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ) : SizedBox.shrink(),
+
+          // Button : Confirm
+          FlatButton(
+            child: Text('Confirm'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    });
+  }
+
+
+  // Device info
+  static Future<Map<String, String>> deviceParams() async {
+    Map<String, String> params = Map();
+    var deviceInfo = DeviceInfoPlugin();
+    String fcmToken = await Prefs.loadFCM();
+
+    if (Platform.isIOS) {
+      var iOSDeviceInfo = await deviceInfo.iosInfo;
+      params.addAll({
+        'device_id' : iOSDeviceInfo.identifierForVendor,
+        'device_type' : 'I',
+        'device_token' : fcmToken,
+      });
+    } else {
+      var androidDeviceInfo = await deviceInfo.androidInfo;
+      params.addAll({
+        'device_id' : androidDeviceInfo.androidId,
+        'device_type' : 'A',
+        'device_token' : fcmToken,
+      });
+    }
+
+    return params;
   }
 }

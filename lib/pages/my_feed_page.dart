@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
 import 'package:flutter_myinsta/services/data_service.dart';
+import 'package:flutter_myinsta/services/utils_service.dart';
 
 import '../model/post_model.dart';
 
@@ -71,6 +72,18 @@ class _MyFeedPageState extends State<MyFeedPage> {
     });
   }
   // ===========================================================================
+
+  _actionRemovePost(Post post) async {
+    if (await Utils.commonDialog(context, 'Logout?', 'Do you want to logout?', false)) {
+      setState(() {
+        isLoading = true;
+      });
+
+      DataService.removePost(post).then((value) => {
+        _apiLoadFeeds(),
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,10 +183,13 @@ class _MyFeedPageState extends State<MyFeedPage> {
                 ),
 
                 // Button : More (Options)
+                post.mine ?
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _actionRemovePost(post);
+                  },
                   icon: Icon(SimpleLineIcons.options),
-                ),
+                ) : SizedBox.shrink(),
               ],
             ),
           ),

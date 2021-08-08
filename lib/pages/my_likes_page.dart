@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
 import 'package:flutter_myinsta/services/data_service.dart';
+import 'package:flutter_myinsta/services/utils_service.dart';
 
 class MyLikesPage extends StatefulWidget {
   static final String id = 'my_likes_page';
@@ -54,6 +55,18 @@ class _MyLikesPageState extends State<MyLikesPage> {
     });
   }
 
+  _actionRemovePost(Post post) async {
+    if (await Utils.commonDialog(context, 'Logout?', 'Do you want to logout?', false)) {
+      setState(() {
+        isLoading = true;
+      });
+
+      DataService.removePost(post).then((value) => {
+        _apiLoadLikes(),
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,11 +115,18 @@ class _MyLikesPageState extends State<MyLikesPage> {
                   children: [
                     // Profile image
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(40),
-                      child: Image(
-                        height: 40,
+                      borderRadius: BorderRadius.circular(22.5),
+                      child: post.imgUser == null || post.imgUser.isEmpty
+                          ? Image(
+                        image: AssetImage("assets/images/ic_profile.png"),
                         width: 40,
-                        image: AssetImage('assets/images/ic_profile.png'),
+                        height: 40,
+                        fit: BoxFit.cover,
+                      )
+                          : Image.network(
+                        post.imgUser,
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -120,11 +140,11 @@ class _MyLikesPageState extends State<MyLikesPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Username',
+                          post.fullName,
                           style: TextStyle(color: Colors.black),
                         ),
                         Text(
-                          'February 2, 2021',
+                          post.date,
                           style: TextStyle(color: Colors.grey),
                         ),
                       ],
@@ -133,10 +153,13 @@ class _MyLikesPageState extends State<MyLikesPage> {
                 ),
 
                 // Button : More (Options)
+                post.mine ?
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _actionRemovePost(post);
+                  },
                   icon: Icon(SimpleLineIcons.options),
-                ),
+                ) : SizedBox.shrink(),
               ],
             ),
           ),

@@ -17,6 +17,15 @@ class DataService {
   // User Related
   static Future storeUser(User user) async {
     user.uid = await Prefs.loadUserId();
+
+    Map<String, String> params = await Utils.deviceParams();
+
+    print(params.toString());
+
+    user.deviceId = params['device_id'];
+    user.deviceType = params['device_type'];
+    user.deviceToken = params['device_token'];
+
     final instance = Firestore.instance;
     return instance
         .collection('users')
@@ -135,6 +144,7 @@ class DataService {
 
     querySnapshot.documents.forEach((element) {
       Post post = Post.fromJson(element.data);
+      if (post.uid == uid) post.mine = true;
       posts.add(post);
     });
     return posts;
@@ -254,5 +264,13 @@ class DataService {
     String uid = await Prefs.loadUserId();
 
     return await _firestore.collection(folder_users).document(uid).collection(folder_feeds).document(post.id).delete();
+  }
+
+  static Future removePost(Post post) async {
+    String uid = await Prefs.loadUserId();
+
+    await removeFeed(post);
+
+    return await _firestore.collection(folder_users).document(uid).collection(folder_posts).document(post.uid).delete();
   }
 }

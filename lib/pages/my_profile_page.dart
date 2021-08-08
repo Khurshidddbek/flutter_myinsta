@@ -7,6 +7,7 @@ import 'package:flutter_myinsta/model/user_model.dart';
 import 'package:flutter_myinsta/services/auth_service.dart';
 import 'package:flutter_myinsta/services/data_service.dart';
 import 'package:flutter_myinsta/services/file_service.dart';
+import 'package:flutter_myinsta/services/utils_service.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyProfilePage extends StatefulWidget {
@@ -148,6 +149,24 @@ class _MyProfilePageState extends State<MyProfilePage> {
     });
   }
 
+  _actionLogout() async {
+    if (await Utils.commonDialog(context, 'Logout?', 'Do you want to logout?', false)) {
+      AuthService.signOutUser(context);
+    }
+  }
+
+  _actionRemovePost(Post post) async {
+    if (await Utils.commonDialog(context, 'Logout?', 'Do you want to logout?', false)) {
+      setState(() {
+        isLoading = true;
+      });
+
+      DataService.removePost(post).then((value) => {
+        _apiLoadPosts(),
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,9 +181,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
         ),
         centerTitle: true,
         actions: [
+          // Button : Logout
           IconButton(
             onPressed: () {
-              AuthService.signOutUser(context);
+              _actionLogout();
             },
             icon: Icon(
               Icons.exit_to_app,
@@ -412,36 +432,41 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget _itemOfPost(Post post) {
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: Column(
-        children: [
-          // Post image
-          Expanded(
-            child: CachedNetworkImage(
+    return GestureDetector(
+      onLongPress: () {
+        _actionRemovePost(post);
+      },
+      child: Container(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          children: [
+            // Post image
+            Expanded(
+              child: CachedNetworkImage(
+                width: double.infinity,
+                imageUrl: post.postImage,
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+            ),
+
+            SizedBox(
+              height: 3,
+            ),
+
+            // Caption
+            Container(
               width: double.infinity,
-              imageUrl: post.postImage,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-          ),
-
-          SizedBox(
-            height: 3,
-          ),
-
-          // Caption
-          Container(
-            width: double.infinity,
-            child: Text(
-              post.caption,
-              maxLines: 2,
-              style: TextStyle(color: Colors.black45, fontSize: 16),
-            ),
-          )
-        ],
+              child: Text(
+                post.caption,
+                maxLines: 2,
+                style: TextStyle(color: Colors.black45, fontSize: 16),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
