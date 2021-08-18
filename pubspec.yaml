@@ -23,6 +23,7 @@ dependencies:
   device_info: ^2.0.0
   firebase_messaging: ^4.0.0+3
   flutter_local_notifications: ^4.0.0
+  share: ^2.0.4
 
 dev_dependencies:
   flutter_test:

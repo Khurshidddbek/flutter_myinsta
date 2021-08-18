@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
+import 'package:flutter_myinsta/pages/someone_profile_page.dart';
 import 'package:flutter_myinsta/services/data_service.dart';
 import 'package:flutter_myinsta/services/utils_service.dart';
+import 'package:share/share.dart';
 
 import '../model/post_model.dart';
 
@@ -135,62 +137,73 @@ class _MyFeedPageState extends State<MyFeedPage> {
           Divider(),
 
           // Profile information
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Profile information
-                Row(
-                  children: [
-                    // Profile image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(22.5),
-                      child: post.imgUser == null || post.imgUser.isEmpty
-                          ? Image(
-                              image: AssetImage("assets/images/ic_profile.png"),
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.network(
-                              post.imgUser,
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            ),
-                    ),
+          GestureDetector(
+            onTap: () {
+              if (post.mine == false)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SomeoneProfilePage(uid: post.uid,),
+                  ),
+                );
+            },
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Profile information
+                  Row(
+                    children: [
+                      // Profile image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(22.5),
+                        child: post.imgUser == null || post.imgUser.isEmpty
+                            ? Image(
+                                image: AssetImage("assets/images/ic_profile.png"),
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                post.imgUser,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
 
-                    SizedBox(
-                      width: 10,
-                    ),
+                      SizedBox(
+                        width: 10,
+                      ),
 
-                    // Username || Data
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          post.fullName,
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        Text(
-                          post.date,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      // Username || Data
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            post.fullName,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          Text(
+                            post.date,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
 
-                // Button : More (Options)
-                post.mine ?
-                IconButton(
-                  onPressed: () {
-                    _actionRemovePost(post);
-                  },
-                  icon: Icon(SimpleLineIcons.options),
-                ) : SizedBox.shrink(),
-              ],
+                  // Button : More (Options)
+                  post.mine ?
+                  IconButton(
+                    onPressed: () {
+                      _actionRemovePost(post);
+                    },
+                    icon: Icon(SimpleLineIcons.options),
+                  ) : SizedBox.shrink(),
+                ],
+              ),
             ),
           ),
 
@@ -218,8 +231,12 @@ class _MyFeedPageState extends State<MyFeedPage> {
                 },
                 icon: !post.liked ? Icon(FontAwesome.heart_o) : Icon(FontAwesome.heart, color: Colors.red,),
               ),
+
+              // Button : Share
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Share.share('Image: ${post.postImage} \n Caption: ${post.caption}');
+                },
                 icon: Icon(Icons.share_outlined),
               ),
             ],

@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_myinsta/main.dart';
 import 'package:flutter_myinsta/pages/home_page.dart';
 import 'package:flutter_myinsta/pages/signin_page.dart';
+import 'package:flutter_myinsta/services/prefs_service.dart';
 
 class SplashPage extends StatefulWidget {
   static final String id = 'splash_page';
@@ -13,9 +16,29 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  // Firebase notification
+  // ===========================================================================
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+  _initNotification() {
+    _firebaseMessaging.requestNotificationPermissions(const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.onIosSettingsRegistered.listen((IosNotificationSettings settings) {
+      print('Setting registered: $settings');
+    });
+    _firebaseMessaging.getToken().then((String token) {
+      assert(token != null);
+
+      print('\n\n\nToken: $token\n\n\n\n\n');
+      Prefs.saveFCM(token);
+    });
+  }
+
+  // ===========================================================================
+
+
   _initTimer() {
     Timer(Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, HomePage.id);
+      Navigator.pushReplacementNamed(context, MyApp.registered ? HomePage.id : SignInPage.id);
     });
   }
 
@@ -25,6 +48,8 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
 
     _initTimer();
+
+    _initNotification();
   }
 
   @override

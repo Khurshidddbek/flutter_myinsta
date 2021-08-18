@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_myinsta/model/user_model.dart';
 import 'package:flutter_myinsta/services/data_service.dart';
+import 'package:flutter_myinsta/services/http_service.dart';
 
 class MySearchPage extends StatefulWidget {
   static final String id = 'my_search_page';
@@ -55,6 +56,15 @@ class _MySearchPageState extends State<MySearchPage> {
     });
 
     DataService.storePostsToMyFeed(someone);
+
+    // Notification
+    String username = '';
+    DataService.loadUser().then((userMe) {
+      username = userMe.fullName;
+    });
+
+    Map<String, dynamic> params = HttpService.paramCreate(username, someone.deviceToken);
+    HttpService.POST(params);
   }
 
   _apiUnfollowUser(User someone) async {

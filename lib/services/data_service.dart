@@ -33,8 +33,11 @@ class DataService {
         .setData(user.toJson());
   }
 
-  static Future<User> loadUser() async {
+  static Future<User> loadUser({String id}) async {
     String uid = await Prefs.loadUserId();
+
+    if (id != null) uid = id;
+
     final instance = Firestore.instance;
 
     var value = await _firestore.collection(folder_users).document(uid).get();
@@ -150,9 +153,11 @@ class DataService {
     return posts;
   }
 
-  static Future<List<Post>> loadPosts() async {
+  static Future<List<Post>> loadPosts({String id}) async {
     List<Post> posts = List();
     String uid = await Prefs.loadUserId();
+
+    if (id != null) uid = id;
 
     var querySnapshot = await _firestore
         .collection(folder_users)
